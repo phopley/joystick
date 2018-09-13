@@ -40,8 +40,8 @@ void Joystick::process(void)
     FD_ZERO(&set_);
     FD_SET(js_, &set_);
     
-    tv_.tv_sec = 1;
-    tv_.tv_usec = 0;
+    tv_.tv_sec = 0;
+    tv_.tv_usec = 250000;
     
     int selectResult = select(js_+1, &set_, NULL, NULL, &tv_);
     
@@ -62,6 +62,7 @@ void Joystick::process(void)
             switch (event.type)
             {
                 case JS_EVENT_BUTTON:
+                case JS_EVENT_BUTTON | JS_EVENT_INIT:
                     // Set the button value                    
                     joyMsgs_.buttons[event.number] = (event.value ? 1 : 0);
                     
@@ -74,6 +75,7 @@ void Joystick::process(void)
                     break;
                     
                 case JS_EVENT_AXIS:
+                case JS_EVENT_AXIS | JS_EVENT_INIT:
                     // Set the axis value 
                     joyMsgs_.axes[event.number] = event.value;
                     
@@ -88,8 +90,7 @@ void Joystick::process(void)
                         joy_status_pub_.publish(joyMsgs_);                 
                     }
 
-                default:
-                    /* Ignore init events. */
+                default:                    
                     break;            
             }
         }  
@@ -142,7 +143,7 @@ int main(int argc, char **argv)
 
     // ros::init() parses argc and argv looking for the := operator.
     // It then modifies the argc and argv leaving any unrecognized command-line parameters for our code to parse.
-    // Either use to set the device name of the joystick or use a default.        
+    // Use command line parameter to set the device name of the joystick or use a default.        
     if (argc > 1)
     {
         device = argv[1];
@@ -158,7 +159,7 @@ int main(int argc, char **argv)
 	ROS_INFO("%s started", node_name.c_str());	
 	
 	// We are not going to use ros::Rate here, the class will use select and 
-	// return when it's time to spin and send the message on the topic
+	// return when it's time to spin and send any messages on the topic
     
     while(ros::ok())
     {
