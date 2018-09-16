@@ -12,7 +12,7 @@ Joystick::Joystick(ros::NodeHandle n, std::string device)
     nh_ = n;
     
     // Advertise the topics we publish
-    joy_status_pub_ = nh_.advertise<sensor_msgs::Joy>("/joystick/status", 5);
+    joy_status_pub_ = nh_.advertise<sensor_msgs::Joy>("joy", 5);
         
     js_ = open(device.c_str(), O_RDONLY);
     
