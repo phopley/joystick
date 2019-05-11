@@ -19,6 +19,7 @@ Joystick::Joystick(ros::NodeHandle n, std::string device)
     if (js_ == -1)
     {
         ROS_ERROR("Problem opening joystick device");
+        ros::shutdown();
     }
     else
     {
